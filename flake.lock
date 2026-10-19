@@ -80,11 +80,35 @@
         "type": "github"
       }
     },
+    "nvim": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "wrappers": [
+          "wrapper-modules"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792399920,
+        "narHash": "sha256-mSRVFwemB40sIj6mIT6fl/GLRxkN3iLU2KTyd6DE41A=",
+        "owner": "rscandino",
+        "repo": "dotnvim",
+        "rev": "bdcf008bf74140a10f946df75199f35f78745242",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rscandino",
+        "repo": "dotnvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
+        "nvim": "nvim",
         "wrapper-modules": "wrapper-modules"
       }
     },

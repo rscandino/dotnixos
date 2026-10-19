@@ -45,6 +45,11 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
 
+  fonts.packages = with pkgs; [
+	  maple-mono.NF
+  ];
+
+
 
   hardware.graphics.enable = true;
   services.xserver.videoDrivers = [ "modesetting" "nvidia" ];
