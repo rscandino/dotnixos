@@ -9,6 +9,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Enable ZRAM
+  zramSwap.enable = true;
+
   networking.hostName = "zbook";
   
   # Configure keymap in X11
@@ -44,21 +47,17 @@
 
 
   hardware.graphics.enable = true;
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = [ "modesetting" "nvidia" ];
 
   hardware.nvidia = {
    modesetting.enable = true;
-   powerManagement.enable = false;
-   powerManagement.finegrained = false;
-   open = false;
+   open = true;
 
    prime = {
-       offload.enable = true;
-       offload.enableOffloadCmd = true;
-
-       intelBusId = "PCI:0:2:0";
-       nvidiaBusId = "PCI:1:0:0";
-     };
+	   offload.enable = true;
+	   intelBusId = "PCI:0@0:2:0";
+	   nvidiaBusId = "PCI:1@0:0:0";
+   };
 
   };
 
@@ -76,6 +75,7 @@
   programs.firefox.enable = true;
   environment.systemPackages = with pkgs; [
     discord-ptb
+    bitwarden-desktop
   ];
 
   system.stateVersion = "26.05";
