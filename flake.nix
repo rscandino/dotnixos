@@ -10,7 +10,15 @@
     nixosConfigurations.zbook = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ./configuration.nix
+        ./hosts/zbook
+        ./modules
+      ];
+    };
+    
+    nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./hosts/vm
         ./modules
       ];
     };
