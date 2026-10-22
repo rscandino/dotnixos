@@ -16,6 +16,7 @@ in {
     environment.systemPackages = with pkgs; [
       xwayland-satellite
       swaybg
+      swayosd
       swaylock
       swayidle
       vimix-cursors
