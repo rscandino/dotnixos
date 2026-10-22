@@ -2,6 +2,7 @@
 # `my.<feature>.enable` option is true (set per host).
 {
   imports = [
+    ./nix.nix
     ./dev.nix
     ./dotfiles.nix
     ./desktop.nix

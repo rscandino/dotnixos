@@ -17,46 +17,9 @@
     initialPassword = "passpass";
   };
 
-  # ------ Features
-  nix.settings = {
-    experimental-features = ["nix-command" "flakes"];
-    auto-optimise-store = true;
-  };
-
-  # ------ Updates
-  system.autoUpgrade = {
-    enable = true;
-    dates = "weekly";
-  };
-
-  # ------ Nix storage management
-  nix.gc = {
-    automatic = true;
-    dates = "daily";
-    options = "--delete-older-than 10d";
-  };
-
-  # ------ Proprietary garbage
-  nixpkgs.config.allowUnfree = true;
-
   # ------ Locale
   time.timeZone = "Europe/Rome";
   i18n.defaultLocale = "en_US.UTF-8";
-
-  # ------ Graphics drivers
-  hardware.graphics.enable = true;
-  services.xserver.videoDrivers = ["modesetting" "nvidia"];
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    open = true;
-
-    prime = {
-      offload.enable = true;
-      intelBusId = "PCI:0@0:2:0";
-      nvidiaBusId = "PCI:1@0:0:0";
-    };
-  };
 
   # ------ System packages
   environment.systemPackages = with pkgs; [
@@ -74,21 +37,21 @@
     htop
   ];
 
-  # ------ Install Fonts
-  fonts.packages = with pkgs; [
-    maple-mono.NF
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.symbols-only
-  ];
+
+# Gnome
+    services.desktopManager.gnome.enable = true;
+    services.displayManager.gdm.enable = true;
+
 
   # ------ Enable modules
-  moduleDev.enable = true;
-  moduleDesktop.enable = true;
-  moduleGaming.enable = true;
+  modNix.enable = true;
+  modDev.enable = true;
+  modDesktop.enable = true;
+  modGaming.enable = true;
 
-  moduleNiri.enable = true;
+  modNiri.enable = true;
 
-  moduleDotfiles = {
+  modDotfiles = {
     enable = true;
     directory = "/home/riccardo/Projects/dotfiles";
   };

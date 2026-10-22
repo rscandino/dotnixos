@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.moduleDev;
+  cfg = config.modDev;
 in {
-  options.moduleDev.enable = lib.mkEnableOption "Development tools" // {default = false;};
+  options.modDev.enable = lib.mkEnableOption "Development tools" // {default = false;};
 
   config = lib.mkIf cfg.enable {
 
@@ -39,6 +39,8 @@ in {
     environment.systemPackages = with pkgs; [
       podman
       podman-compose
+      git
+      jujutsu
       ripgrep
       fd
       jq

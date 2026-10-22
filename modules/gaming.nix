@@ -1,26 +1,50 @@
-{ config, lib, pkgs, ... }:
-let cfg = config.moduleGaming; in
 {
-  options.moduleGaming.enable = lib.mkEnableOption "Steam and gamemode" // {default = false;};
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modGaming;
+in {
+  options.modGaming.enable = lib.mkEnableOption "Steam and gamemode" // {default = false;};
 
   config = lib.mkIf cfg.enable {
+    # PRIME Graphics drivers hybrid-mode offload
+    hardware.graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
 
-      # STEAM install and setup
-      programs.steam = {
-          enable = true;
-          package = pkgs.steam.override {
-              extraProfile = ''
-                  export __NV_PRIME_RENDER_OFFLOAD=1
-                  export __GLX_VENDOR_LIBRARY_NAME=nvidia
-                  export __VK_LAYER_NV_optimus=NVIDIA_only
-                  '';
-          };
+    services.xserver.videoDrivers = ["modesetting" "nvidia"];
+
+    hardware.nvidia = {
+      modesetting.enable = true;
+      open = true;
+
+      powerManagement.enable = true;
+      powerManagement.finegrained = true;
+
+      prime = {
+        offload.enable = true;
+        offload.enableOffloadCmd = true;
+        intelBusId = "PCI:0@0:2:0";
+        nvidiaBusId = "PCI:1@0:0:0";
       };
+    };
 
-      # GAMEMODE
-      programs.gamemode.enable = true;
+    # STEAM
+    programs.steam = {
+      enable = true;
+      gamescopeSession.enable = true;
+    };
 
-      # DISCORD install
-      environment.systemPackages = with pkgs; [ discord-ptb ];
+    # GAMEMODE
+    programs.gamemode.enable = true;
+
+    # DISCORD and MANGOHUD
+    environment.systemPackages = with pkgs; [
+      discord-ptb
+      mangohud
+    ];
   };
 }

@@ -6,9 +6,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.moduleDotfiles;
+  cfg = config.modDotfiles;
 in {
-  options.moduleDotfiles = {
+  options.modDotfiles = {
     enable = lib.mkEnableOption "Stowing dotfiles at login" // {default = false;};
 
     directory = lib.mkOption {

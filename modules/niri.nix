@@ -1,17 +1,27 @@
-{ config, lib, pkgs, ... }:
-let cfg = config.moduleNiri; in
 {
-    options.moduleNiri.enable = lib.mkEnableOption "Niri compositor" // { default = false; };
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modNiri;
+in {
+  options.modNiri.enable = lib.mkEnableOption "Niri compositor" // {default = false;};
 
-    config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
+    # Niri
+    programs.niri.enable = true;
 
-        # Niri
-        programs.niri.enable = true;
-
-        # Packages
-        environment.systemPackages = with pkgs; [
-            fuzzel
-            alacritty
-        ];
-    };
+    # Packages
+    environment.systemPackages = with pkgs; [
+      xwayland-satellite
+      swaybg
+      swaylock
+      swayidle
+      vimix-cursors
+      adwaita-icon-theme
+      fuzzel
+      alacritty
+    ];
+  };
 }
