@@ -1,13 +1,7 @@
 {
-  config,
-  lib,
   ...
-}: let
-  cfg = config.modNix;
-in {
-  options.modNix.enable = lib.mkEnableOption "Nix settings" // {default = false;};
+}: {
 
-  config = lib.mkIf cfg.enable {
     nix.settings = {
       experimental-features = ["nix-command" "flakes"];
       auto-optimise-store = true;
@@ -25,5 +19,4 @@ in {
     };
 
     nixpkgs.config.allowUnfree = true;
-  };
 }

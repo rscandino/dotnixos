@@ -9,9 +9,6 @@ in {
   options.modDesktop.enable = lib.mkEnableOption "Desktop setup no dekstop envinroment" // {default = false;};
 
   config = lib.mkIf cfg.enable {
-    # Enable ZRAM
-    zramSwap.enable = true;
-
     # Enable sound with pipewire.
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
@@ -37,9 +34,8 @@ in {
     environment.systemPackages = with pkgs; [
       firefox
       google-chrome
-      alacritty
       ghostty
-      kitty
+      foot
       telegram-desktop
       gimp
       inkscape

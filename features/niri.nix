@@ -15,9 +15,9 @@ in {
     # Packages
     environment.systemPackages = with pkgs; [
       xwayland-satellite
+      xdg-desktop-portal
       swaybg
       swayosd
-      swaylock
       swayidle
       vimix-cursors
       adwaita-icon-theme

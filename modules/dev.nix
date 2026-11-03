@@ -1,14 +1,7 @@
 {
-  config,
-  lib,
   pkgs,
   ...
-}: let
-  cfg = config.modDev;
-in {
-  options.modDev.enable = lib.mkEnableOption "Development tools" // {default = false;};
-
-  config = lib.mkIf cfg.enable {
+}: {
 
     # NEOVIM install; the config (~/.config/nvim) must be defined (or stowed).
     programs.neovim = {
@@ -54,5 +47,4 @@ in {
       stylua
       ast-grep
     ];
-  };
 }

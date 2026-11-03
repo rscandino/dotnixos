@@ -4,9 +4,6 @@
   imports = [
     ./nix.nix
     ./dev.nix
-    ./dotfiles.nix
-    ./desktop.nix
-    ./niri.nix
-    ./gaming.nix
+    ./locale.nix
   ];
 }
