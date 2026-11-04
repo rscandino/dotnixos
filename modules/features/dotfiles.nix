@@ -1,22 +1,19 @@
-# Runs GNU Stow at login so ~/.dotfiles stays symlinked into $HOME
-# Nix only installs stow and re-runs it
 {
   config,
   lib,
   pkgs,
   ...
 }: let
-  cfg = config.modDotfiles;
+  cfg = config.modules.dotfiles;
 in {
-  options.modDotfiles = {
-    enable = lib.mkEnableOption "Stowing dotfiles at login" // {default = false;};
+  options.modules.dotfiles = {
+    enable = lib.mkEnableOption "Stowing dotfiles at login";
 
     directory = lib.mkOption {
       type = lib.types.str;
       default = "%h/.dotfiles"; # %h = the user's home (systemd specifier)
-      description = "Where the dotfiles repo is checked out.";
+      description = "Where the dotfiles repo is checked out";
     };
-
   };
 
   config = lib.mkIf cfg.enable {
@@ -25,7 +22,7 @@ in {
     systemd.user.services.stow-dotfiles = {
       description = "Symlink dotfiles with GNU Stow";
       wantedBy = ["default.target"];
-      unitConfig.ConditionPathExists = cfg.directory; # skip if not present at path
+      unitConfig.ConditionPathExists = cfg.directory;
       serviceConfig = {
         Type = "oneshot";
         WorkingDirectory = cfg.directory;

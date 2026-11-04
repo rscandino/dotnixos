@@ -1,37 +1,38 @@
 {
+  config,
+  lib,
   pkgs,
   ...
-}: {
+}: let
+  cfg = config.modules.dev;
+in {
+  options.modules.dev.enable = lib.mkEnableOption "development tools";
 
-    # NEOVIM install; the config (~/.config/nvim) must be defined (or stowed).
+  config = lib.mkIf cfg.enable {
     programs.neovim = {
       enable = true;
       defaultEditor = true;
     };
 
-    # DIRENV, when in devShel automatic enabling through .envrc
     programs.direnv = {
       enable = true;
       nix-direnv.enable = true;
     };
 
-    # TMUX setup
     programs.tmux = {
       enable = true;
       clock24 = true;
     };
 
-    # PODMAN enable virtualisation
     virtualisation.podman = {
       enable = true;
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
     };
 
-    # System packages
     environment.systemPackages = with pkgs; [
-      podman
       podman-compose
+      distrobox
       git
       jujutsu
       ripgrep
@@ -39,7 +40,6 @@
       jq
       gcc
       gnumake
-      wl-clipboard
       tree-sitter
       nil
       alejandra
@@ -47,4 +47,5 @@
       stylua
       ast-grep
     ];
+  };
 }
