@@ -15,18 +15,20 @@
     nixpkgs,
     mangowm,
     ...
-  }: {
-    nixosConfigurations.zbook = nixpkgs.lib.nixosSystem {
-      modules = [
-        ./hosts/zbook
-        ./hosts/common
-        ./modules
-
-        mangowm.nixosModules.mango
-        {
-          programs.mango.enable = true;
-        }
-      ];
+  }: let
+    mkHost = name:
+      nixpkgs.lib.nixosSystem {
+        modules = [
+          ./modules
+          ./hosts/common
+          ./hosts/${name}/configuration.nix
+          mangowm.nixosModules.mango
+        ];
+      };
+  in {
+    nixosConfigurations = {
+      zbook = mkHost "zbook";
+    # newhost = mkHost "newhost";
     };
 
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;

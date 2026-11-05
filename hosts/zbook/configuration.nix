@@ -27,7 +27,7 @@
     audio.enable = true;
     fonts.enable = true;
     apps.enable = true;
-    nautilus.enable = true;
+    gaming.enable = true;
 
     cli.enable = true;
     dev.enable = true;

@@ -11,7 +11,11 @@ in {
   options.modules.mango.enable = lib.mkEnableOption "MangoWC compositor and session tools";
 
   config = lib.mkIf cfg.enable {
+
     programs.mango.enable = true;
+
+    # required for xwayland
+    services.xserver.enable = true;
 
     security.polkit.enable = true;
     security.pam.services.swaylock = {};
