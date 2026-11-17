@@ -3,9 +3,9 @@
   lib,
   ...
 }: let
-  cfg = config.modules.audio;
+  cfg = config.modules.desktop.audio;
 in {
-  options.modules.audio.enable = lib.mkEnableOption "PipeWire audio";
+  options.modules.desktop.audio.enable = lib.mkEnableOption "PipeWire audio";
 
   config = lib.mkIf cfg.enable {
     services.pulseaudio.enable = false;

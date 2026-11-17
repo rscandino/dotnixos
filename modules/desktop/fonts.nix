@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.modules.fonts;
+  cfg = config.modules.desktop.fonts;
 in {
-  options.modules.fonts.enable = lib.mkEnableOption "System fonts";
+  options.modules.desktop.fonts.enable = lib.mkEnableOption "System fonts";
 
   config = lib.mkIf cfg.enable {
     fonts.packages = with pkgs; [

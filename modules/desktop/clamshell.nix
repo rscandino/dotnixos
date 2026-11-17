@@ -5,7 +5,7 @@
   pkgs,
   ...
 }: let
-  cfg = config.modules.clamshell;
+  cfg = config.modules.desktop.clamshell;
 
   clamshell = pkgs.writeShellApplication {
     name = "clamshell";
@@ -35,8 +35,8 @@
     '';
   };
 in {
-  options.modules.clamshell = {
-    enable = lib.mkEnableOption "Clamshell mode (internal display off when lid closed with external monitor)";
+  options.modules.desktop.clamshell = {
+    enable = lib.mkEnableOption "Wayland Clamshell mode";
 
     internalOutput = lib.mkOption {
       type = lib.types.str;
@@ -53,7 +53,7 @@ in {
     };
 
     # libinput debug-events needs access to the input devices
-    users.users.${config.myUser.name}.extraGroups = ["input"];
+    users.users.${config.modules.system.user.name}.extraGroups = ["input"];
 
     environment.systemPackages = [clamshell pkgs.wlr-randr];
 

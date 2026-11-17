@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.modules.gaming;
+  cfg = config.modules.desktop.gaming;
 in {
-  options.modules.gaming.enable = lib.mkEnableOption "Steam, gamemode and gaming tools";
+  options.modules.desktop.gaming.enable = lib.mkEnableOption "Steam, gamemode and gaming tools";
 
   config = lib.mkIf cfg.enable {
     hardware.graphics = {

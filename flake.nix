@@ -5,6 +5,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    # MangoWC tiling window manager
     mangowm = {
       url = "github:mangowm/mango";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,7 +21,6 @@
       nixpkgs.lib.nixosSystem {
         modules = [
           ./modules
-          ./hosts/common
           ./hosts/${name}/configuration.nix
           mangowm.nixosModules.mango
         ];
@@ -28,7 +28,7 @@
   in {
     nixosConfigurations = {
       zbook = mkHost "zbook";
-    # newhost = mkHost "newhost";
+      # newhost = mkHost "newhost";
     };
 
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;

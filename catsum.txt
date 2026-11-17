@@ -1,0 +1,1294 @@
+===== ./flake.lock =====
+{
+  "nodes": {
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib"
+      },
+      "locked": {
+        "lastModified": 1782949081,
+        "narHash": "sha256-vp6Y/Grm98ESt6ceOkWiHWyZRDV3J1RID4w+6NWK9yA=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": [
+          "mangowm",
+          "scenefx",
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "mangowm": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "scenefx": "scenefx"
+      },
+      "locked": {
+        "lastModified": 1793772792,
+        "narHash": "sha256-B2o+D2ywW0UNE9ok0jXha6YvRXMaBfTmGOXTgtZrj8s=",
+        "owner": "mangowm",
+        "repo": "mango",
+        "rev": "faaf4a961f943692f2657eb992a8aa90022f921e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mangowm",
+        "repo": "mango",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1793540411,
+        "narHash": "sha256-fiPJ88izTVucjeo2EQ3jk4aWmLg03I1D4vxnX2QjEgE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0bb2eedc20e4739f29e8045034f2828ad7054f8f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-lib": {
+      "locked": {
+        "lastModified": 1782614948,
+        "narHash": "sha256-ePjCwr1sNm9NYUqywL7QfK3JnlS015msC+eBu2zKlp8=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "db3f255737b94216eb71cce308e2912cf6bc2d7c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "mangowm": "mangowm",
+        "nixpkgs": "nixpkgs"
+      }
+    },
+    "scenefx": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "mangowm",
+          "nixpkgs"
+        ],
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1782624992,
+        "narHash": "sha256-vUjLG6eubEhJJVa9LPygIcVmNoHwYbSUTJcWEcbxnU4=",
+        "owner": "wlrfx",
+        "repo": "scenefx",
+        "rev": "37ccd723bef49e6891156ffafce8f549f01446cc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wlrfx",
+        "repo": "scenefx",
+        "type": "github"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1689347949,
+        "narHash": "sha256-12tWmuL2zgBgZkdoB6qXZsgJEH9LR3oUgpaQq2RbI80=",
+        "owner": "nix-systems",
+        "repo": "default-linux",
+        "rev": "31732fcf5e8fea42e59c2488ad31a0e651500f68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default-linux",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
+
+===== ./flake.nix =====
+# flake.nix: wiring only, no configuration
+{
+  description = "NixOS flake config";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # MangoWC tiling window manager
+    mangowm = {
+      url = "github:mangowm/mango";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = {
+    nixpkgs,
+    mangowm,
+    ...
+  }: let
+    mkHost = name:
+      nixpkgs.lib.nixosSystem {
+        modules = [
+          ./modules
+          ./hosts/${name}/configuration.nix
+          mangowm.nixosModules.mango
+        ];
+      };
+  in {
+    nixosConfigurations = {
+      zbook = mkHost "zbook";
+      # newhost = mkHost "newhost";
+    };
+
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
+  };
+}
+
+===== ./hosts/zbook/configuration.nix =====
+{config, ...}: {
+  imports = [
+    ./hardware-configuration.nix
+  ];
+
+  zramSwap.enable = true;
+
+  services.displayManager.ly.enable = true;
+
+  modules = {
+
+    boot = {
+      systemd-boot.enable = true;
+      plymouth = {
+        enable = true;
+        theme = "loader_2";
+      };
+    };
+
+    hardware = {
+      intel.enable = true;
+      nvidiaPrime = {
+        enable = true;
+        intelBusId = "PCI:0@0:2:0";
+        nvidiaBusId = "PCI:1@0:0:0";
+        igpuPciAddress = "0000:00:02.0";
+      };
+
+      powerManagement = {
+        enable = true;
+        backend = "tlp";
+        tlp.chargeThresholds = {
+          start = 75;
+          stop = 80;
+        };
+      };
+
+      input.enable = true;
+    };
+
+    system = {
+      user.name = "riccardo";
+      nix.enable = true;
+      locale.enable = true;
+      networkManager = {
+        enable = true;
+        hostName = "zbook";
+        randomizeMac = true;
+      };
+    };
+
+    desktop = {
+      clamshell.enable = true;
+    };
+
+    mango.enable = true;
+    audio.enable = true;
+    fonts.enable = true;
+    apps.enable = true;
+    gaming.enable = true;
+
+    cli.enable = true;
+    dev.enable = true;
+    catsum.enable = true;
+    dotfiles = {
+      enable = true;
+      directory = "/home/${config.modules.system.user.name}/Projects/dotfiles";
+    };
+  };
+
+  # Set to the NixOS release you first installed; do not bump it later.
+  system.stateVersion = "26.05";
+}
+
+===== ./hosts/zbook/hardware-configuration.nix =====
+# Do not modify this file!  It was generated by ‘nixos-generate-config’
+# and may be overwritten by future invocations.  Please make changes
+# to /etc/nixos/configuration.nix instead.
+{
+  config,
+  lib,
+  modulesPath,
+  ...
+}: {
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+  ];
+
+  boot.initrd.availableKernelModules = ["xhci_pci" "thunderbolt" "nvme" "usbhid" "usb_storage" "sd_mod"];
+  boot.initrd.kernelModules = [];
+  boot.kernelModules = ["kvm-intel"];
+  boot.extraModulePackages = [];
+
+  fileSystems."/" = {
+    device = "/dev/mapper/luks-1b47dd26-ef25-4e8f-891d-2e38455bd37d";
+    fsType = "btrfs";
+  };
+
+  boot.initrd.luks.devices."luks-1b47dd26-ef25-4e8f-891d-2e38455bd37d".device = "/dev/disk/by-uuid/1b47dd26-ef25-4e8f-891d-2e38455bd37d";
+
+  fileSystems."/home" = {
+    device = "/dev/mapper/luks-1b47dd26-ef25-4e8f-891d-2e38455bd37d";
+    fsType = "btrfs";
+    options = ["subvol=home"];
+  };
+
+  fileSystems."/nix" = {
+    device = "/dev/mapper/luks-1b47dd26-ef25-4e8f-891d-2e38455bd37d";
+    fsType = "btrfs";
+    options = ["subvol=nix"];
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/1346-BDC0";
+    fsType = "vfat";
+    options = ["fmask=0077" "dmask=0077"];
+  };
+
+  swapDevices = [];
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.intel.npu.enable = true;
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+}
+
+===== ./modules/boot/plymouth.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.boot.plymouth;
+in {
+  options.modules.boot.plymouth = {
+    enable = lib.mkEnableOption "Plymouth and quiet boot setup";
+
+    theme = lib.mkOption {
+      type = lib.types.str;
+      default = "loader_2";
+      description = ''
+        Plymouth theme to select. For list of themes check https://github.com/adi1090x/plymouth-themes
+        Theme names are lowercase, replace "spaces" with "_"
+      '';
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    boot = {
+      plymouth = {
+        enable = true;
+        theme = cfg.theme;
+        themePackages = with pkgs; [
+          (adi1090x-plymouth-themes.override {
+            selected_themes = [cfg.theme];
+          })
+        ];
+      };
+
+      consoleLogLevel = 0;
+      kernelParams = [
+        "quiet"
+        "splash"
+        "udev.log_priority=3"
+      ];
+
+      # rollback selection timeout
+      loader.timeout = 3;
+    };
+  };
+}
+
+===== ./modules/boot/systemd-boot.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.boot.systemd-boot;
+in {
+  options.modules.boot.systemd-boot.enable = lib.mkEnableOption "Systemd-boot with efi access";
+
+  config = lib.mkIf cfg.enable {
+    boot.loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+
+    environment.systemPackages = with pkgs; [
+      efibootmgr
+    ];
+  };
+}
+
+===== ./modules/catsum.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.catsum;
+
+  catsum = pkgs.writeShellApplication {
+    name = "catsum";
+
+    runtimeInputs = with pkgs; [coreutils fd];
+
+    text = ''
+            out="catsum.txt"
+
+      fd --type f --print0 --exclude "/$out" | sort -z |
+      while IFS= read -r -d "" f; do
+        printf '===== %s =====\n' "$f"
+        cat "$f"
+        printf '\n'
+      done > "$out"
+
+      echo "Done: $PWD/$out"
+    '';
+  };
+in {
+  options.modules.catsum.enable = lib.mkEnableOption "catsum, concatenate all files in the current directory into catsum.txt";
+
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = [catsum];
+  };
+}
+
+===== ./modules/cli.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.cli;
+in {
+  options.modules.cli.enable = lib.mkEnableOption "Everyday CLI and diagnostic tools";
+
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = with pkgs; [
+      git
+      curl
+      wget
+      pciutils
+      usbutils
+      lshw
+      tree
+      fzf
+      zoxide
+      eza
+      bat
+      htop
+    ];
+  };
+}
+
+===== ./modules/default.nix =====
+# Auto-imports every .nix file below this directory (except default.nix files).
+# Adding a module = dropping a file in. Every module is off by default.
+{lib, ...}: {
+  imports =
+    lib.filter
+    (p: lib.hasSuffix ".nix" (toString p) && baseNameOf p != "default.nix")
+    (lib.filesystem.listFilesRecursive ./.);
+}
+
+===== ./modules/desktop/apps.nix =====
+# Everyday graphical applications and printing.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.apps;
+in {
+  options.modules.apps.enable = lib.mkEnableOption "everyday desktop applications";
+
+  config = lib.mkIf cfg.enable {
+    # nautilus support
+    services.gvfs.enable = true; # Trash, USB, network shares
+    services.gnome.sushi.enable = true; # space-bar preview
+
+    services.printing.enable = true;
+
+    environment.systemPackages = with pkgs; [
+      nautilus
+      ffmpegthumbnailer
+      adwaita-icon-theme
+      firefox
+      google-chrome
+      ghostty
+      telegram-desktop
+      gimp
+      inkscape
+      loupe
+      gnome-text-editor
+    ];
+  };
+}
+
+===== ./modules/desktop/audio.nix =====
+{
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.modules.audio;
+in {
+  options.modules.audio.enable = lib.mkEnableOption "PipeWire audio";
+
+  config = lib.mkIf cfg.enable {
+    services.pulseaudio.enable = false;
+    security.rtkit.enable = true;
+    services.pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+      jack.enable = true;
+    };
+  };
+}
+
+===== ./modules/desktop/clamshell.nix =====
+# Clamshell mode for wayland WM that dont built-in it (mango, hyperland, ...)
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.desktop.clamshell;
+
+  clamshell = pkgs.writeShellApplication {
+    name = "clamshell";
+    runtimeInputs = [pkgs.wlr-randr pkgs.libinput pkgs.coreutils pkgs.gnugrep];
+    text = ''
+      INTERNAL="${cfg.internalOutput}"
+
+      has_external() {
+        wlr-randr | grep -E '^[A-Za-z]' | grep -qv "^$INTERNAL"
+      }
+
+      echo "Service clamshell started"
+
+      libinput debug-events 2>/dev/null | while read -r line; do
+        case "$line" in
+          *SWITCH_TOGGLE*lid*state\ 1*)
+            echo "Lid closed"
+            if has_external; then
+              echo "External monitor found, internal off"
+              wlr-randr --output "$INTERNAL" --off
+            fi ;;
+          *SWITCH_TOGGLE*lid*state\ 0*)
+            echo "Lid open, internal on"
+            wlr-randr --output "$INTERNAL" --on ;;
+        esac
+      done
+    '';
+  };
+in {
+  options.modules.desktop.clamshell = {
+    enable = lib.mkEnableOption "Wayland Clamshell mode";
+
+    internalOutput = lib.mkOption {
+      type = lib.types.str;
+      default = "eDP-1";
+      description = "Name of the internal display output (see wlr-randr).";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    services.logind.settings.Login = {
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchExternalPower = "suspend";
+      HandleLidSwitchDocked = "ignore";
+    };
+
+    # libinput debug-events needs access to the input devices
+    users.users.${config.modules.system.user.name}.extraGroups = ["input"];
+
+    environment.systemPackages = [clamshell pkgs.wlr-randr];
+
+    systemd.user.services.clamshell = {
+      description = "Disable internal display when lid is closed";
+      wantedBy = ["graphical-session.target"];
+      partOf = ["graphical-session.target"];
+      after = ["graphical-session.target"];
+      serviceConfig = {
+        ExecStart = "${clamshell}/bin/clamshell";
+        Restart = "always";
+        RestartSec = 2;
+      };
+    };
+  };
+}
+
+===== ./modules/desktop/fonts.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.fonts;
+in {
+  options.modules.fonts.enable = lib.mkEnableOption "System fonts";
+
+  config = lib.mkIf cfg.enable {
+    fonts.packages = with pkgs; [
+      maple-mono.NF
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.iosevka
+      nerd-fonts.monaspace
+      nerd-fonts.symbols-only
+    ];
+  };
+}
+
+===== ./modules/desktop/gaming.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.gaming;
+in {
+  options.modules.gaming.enable = lib.mkEnableOption "Steam, gamemode and gaming tools";
+
+  config = lib.mkIf cfg.enable {
+    hardware.graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+
+    programs.gamemode.enable = true;
+
+    programs.steam = {
+      enable = true;
+      gamescopeSession.enable = true;
+    };
+
+    environment.systemPackages = with pkgs; [
+      discord-ptb
+      mangohud
+    ];
+  };
+}
+
+===== ./modules/desktop/mango.nix =====
+# MangoWC compositor plus the session tools it needs.
+# Requires mangowm.nixosModules.mango to be imported (done in flake.nix).
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.mango;
+in {
+  options.modules.mango.enable = lib.mkEnableOption "MangoWC compositor and session tools";
+
+  config = lib.mkIf cfg.enable {
+    programs.mango.enable = true;
+
+    # required for xwayland
+    services.xserver.enable = true;
+
+    security.polkit.enable = true;
+    security.pam.services.swaylock = {};
+
+    environment.systemPackages = with pkgs; [
+      polkit_gnome
+      xdg-desktop-portal
+      wlr-randr
+      wl-clipboard
+      grim
+      slurp
+      swaybg
+      swayosd
+      swayidle
+      swaylock
+      fuzzel
+      vimix-cursors
+      adwaita-icon-theme
+      foot
+    ];
+  };
+}
+
+===== ./modules/dev.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.dev;
+in {
+  options.modules.dev.enable = lib.mkEnableOption "development tools";
+
+  config = lib.mkIf cfg.enable {
+    programs.neovim = {
+      enable = true;
+      defaultEditor = true;
+    };
+
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    programs.tmux = {
+      enable = true;
+      clock24 = true;
+    };
+
+    virtualisation.podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
+
+    environment.systemPackages = with pkgs; [
+      podman-compose
+      distrobox
+      git
+      jujutsu
+      ripgrep
+      fd
+      jq
+      gcc
+      gnumake
+      tree-sitter
+      nil
+      alejandra
+      lua-language-server
+      stylua
+      ast-grep
+    ];
+  };
+}
+
+===== ./modules/dotfiles.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.dotfiles;
+in {
+  options.modules.dotfiles = {
+    enable = lib.mkEnableOption "Stowing dotfiles at login";
+
+    directory = lib.mkOption {
+      type = lib.types.str;
+      default = "%h/.dotfiles"; # %h = the user's home (systemd specifier)
+      description = "Where the dotfiles repo is checked out";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = [pkgs.stow];
+
+    systemd.user.services.stow-dotfiles = {
+      description = "Symlink dotfiles with GNU Stow";
+      wantedBy = ["default.target"];
+      unitConfig.ConditionPathExists = cfg.directory;
+      serviceConfig = {
+        Type = "oneshot";
+        WorkingDirectory = cfg.directory;
+        ExecStart = "${pkgs.stow}/bin/stow --restow --no-folding --target=%h .";
+      };
+    };
+  };
+}
+
+===== ./modules/hardware/intel.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.hardware.intel;
+in {
+  options.modules.hardware.intel.enable = lib.mkEnableOption "Intel hardware cpu/graphics";
+
+  config = lib.mkIf cfg.enable {
+    hardware = {
+      graphics = {
+        enable = true;
+        extraPackages = with pkgs; [
+          intel-media-driver
+          vpl-gpu-rt
+          intel-compute-runtime
+        ];
+      };
+      cpu.intel.updateMicrocode = true;
+    };
+
+    environment.sessionVariables = {
+      LIBVA_DRIVER_NAME = "iHD";
+    };
+  };
+}
+
+===== ./modules/hardware/laptop.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.hardware.input;
+in {
+  options.modules.hardware.input.enable = lib.mkEnableOption "Set up keyboard, touchpad, etc.";
+
+  config = lib.mkIf cfg.enable {
+    services.libinput = {
+      enable = true;
+      touchpad = {
+        tapping = true;
+        naturalScrolling = true;
+        middleEmulation = true;
+      };
+    };
+
+    environment.systemPackages = [pkgs.brightnessctl];
+  };
+}
+
+===== ./modules/hardware/nvidia-prime.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.hardware.nvidiaPrime;
+in {
+  options.modules.hardware.nvidiaPrime = {
+    enable = lib.mkEnableOption "NVIDIA PRIME hybrid graphics";
+
+    mode = lib.mkOption {
+      type = lib.types.enum ["offload" "sync" "reverseSync"];
+      default = "offload";
+      description = ''
+        offload: iGPU drives the display, NVIDIA renders only when asked (best battery).
+        sync: NVIDIA renders everything (best performance, worst battery).
+        reverseSync: NVIDIA drives the display, iGPU assists (experimental).
+      '';
+    };
+
+    intelBusId = lib.mkOption {
+      type = lib.types.str;
+      example = "PCI:0@0:2:0";
+      description = "Bus ID of the Intel GPU (see lspci).";
+    };
+
+    nvidiaBusId = lib.mkOption {
+      type = lib.types.str;
+      example = "PCI:1@0:0:0";
+      description = "Bus ID of the NVIDIA GPU (see lspci).";
+    };
+
+    open = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Use the open kernel modules (Turing and newer only).";
+    };
+
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = config.boot.kernelPackages.nvidiaPackages.stable;
+      defaultText = lib.literalExpression "config.boot.kernelPackages.nvidiaPackages.stable";
+      description = "NVIDIA driver package (e.g. nvidiaPackages.beta or .production).";
+    };
+
+    finegrainedPower = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Power the dGPU fully off when idle. Only valid with mode = offload.";
+    };
+
+    vaapi = lib.mkEnableOption "NVIDIA VA-API video decode (nvidia-vaapi-driver)";
+
+    igpuPciAddress = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "0000:00:02.0";
+      description = ''
+        PCI address of the iGPU. Creates /dev/dri/igpu and points the
+        wlroots compositor at it (WLR_DRM_DEVICES), so it does not pick
+        the NVIDIA GPU and keep it awake.
+        Check with "udevadm info -a /dev/dri/card1 | grep KERNELS" (card0 etc)
+      '';
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.mode != "offload" || cfg.igpuPciAddress != null;
+        message = "modules.hardware.nvidiaPrime: set igpuPciAddress in offload mode.";
+      }
+      {
+        assertion = config.modules.hardware.intel.enable;
+        message = "modules.hardware.nvidiaPrime expects modules.hardware.intel to be enabled.";
+      }
+    ];
+
+    # Also what makes Wayland sessions load the NVIDIA kernel driver
+    services.xserver.videoDrivers = ["modesetting" "nvidia"];
+
+    hardware.nvidia = {
+      inherit (cfg) open package;
+      modesetting.enable = true;
+      nvidiaSettings = true;
+
+      # Needed for suspend/resume (relevant to lid suspend and clamshell)
+      powerManagement.enable = true;
+      powerManagement.finegrained = cfg.finegrainedPower;
+
+      prime = {
+        inherit (cfg) intelBusId nvidiaBusId;
+        offload = lib.mkIf (cfg.mode == "offload") {
+          enable = true;
+          enableOffloadCmd = true;
+        };
+        sync.enable = cfg.mode == "sync";
+        reverseSync.enable = cfg.mode == "reverseSync";
+      };
+    };
+
+    services.udev.extraRules = lib.mkIf (cfg.igpuPciAddress != null) ''
+      SUBSYSTEM=="drm", KERNEL=="card*", KERNELS=="${cfg.igpuPciAddress}", SYMLINK+="dri/igpu"
+    '';
+
+    environment.sessionVariables = lib.mkIf (cfg.igpuPciAddress != null) {
+      WLR_DRM_DEVICES = "/dev/dri/igpu";
+    };
+
+    environment.systemPackages = lib.mkIf cfg.vaapi [pkgs.nvidia-vaapi-driver];
+  };
+}
+
+===== ./modules/hardware/powerManagement.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.hardware.powerManagement;
+  tlp = cfg.tlp;
+in {
+  options.modules.hardware.powerManagement = {
+    enable = lib.mkEnableOption "Laptop power management";
+
+    backend = lib.mkOption {
+      type = lib.types.enum ["ppd" "tlp"];
+      default = "ppd";
+      description = ''
+        ppd: power-profiles-daemon. Manual profile switching
+        (powerprofilesctl), simple, nothing to tune.
+        tlp: automatic AC/battery switching plus device tuning and
+        optional charge thresholds.
+      '';
+    };
+
+    thermald = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Run thermald (Intel thermal management).";
+    };
+
+    tlp = {
+      battery = lib.mkOption {
+        type = lib.types.str;
+        default = "BAT0";
+        description = "Battery name used for charge thresholds (see /sys/class/power_supply).";
+      };
+
+      chargeThresholds = lib.mkOption {
+        type = lib.types.nullOr (lib.types.submodule {
+          options = {
+            start = lib.mkOption {
+              type = lib.types.ints.between 0 100;
+              default = 75;
+            };
+            stop = lib.mkOption {
+              type = lib.types.ints.between 0 100;
+              default = 80;
+            };
+          };
+        });
+        default = null;
+        description = ''
+          Battery charge thresholds. Only set if
+          ls /sys/class/power_supply/BAT0/ shows charge_control_end_threshold.
+        '';
+      };
+
+      extraSettings = lib.mkOption {
+        type = lib.types.attrsOf (lib.types.oneOf [lib.types.str lib.types.int lib.types.bool]);
+        default = {};
+        description = "Extra TLP settings, merged over the defaults below.";
+      };
+    };
+  };
+
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
+      assertions = [
+        {
+          assertion = !(cfg.backend == "ppd" && tlp.chargeThresholds != null);
+          message = "modules.hardware.powerManagement.tlp.chargeThresholds requires backend = \"tlp\".";
+        }
+      ];
+
+      powerManagement.enable = true;
+
+      services.upower.enable = true;
+      services.thermald.enable = cfg.thermald;
+
+      environment.systemPackages = with pkgs; [acpi];
+    }
+
+    (lib.mkIf (cfg.backend == "ppd") {
+      services.power-profiles-daemon.enable = true;
+      services.tlp.enable = false;
+    })
+
+    (lib.mkIf (cfg.backend == "tlp") {
+      services.power-profiles-daemon.enable = false;
+
+      services.tlp = {
+        enable = true;
+        settings =
+          {
+            CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance";
+            CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+
+            # Check /sys/firmware/acpi/platform_profile_choices for valid values
+            PLATFORM_PROFILE_ON_AC = "performance";
+            PLATFORM_PROFILE_ON_BAT = "balanced";
+
+            CPU_BOOST_ON_AC = 1;
+            CPU_BOOST_ON_BAT = 0;
+            CPU_HWP_DYN_BOOST_ON_AC = 1;
+            CPU_HWP_DYN_BOOST_ON_BAT = 0;
+          }
+          // lib.optionalAttrs (tlp.chargeThresholds != null) {
+            "START_CHARGE_THRESH_${tlp.battery}" = tlp.chargeThresholds.start;
+            "STOP_CHARGE_THRESH_${tlp.battery}" = tlp.chargeThresholds.stop;
+          }
+          // tlp.extraSettings;
+      };
+    })
+  ]);
+}
+
+===== ./modules/system/locale.nix =====
+{
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.modules.system.locale;
+
+  lcCategories = [
+    "LC_ADDRESS"
+    "LC_IDENTIFICATION"
+    "LC_MEASUREMENT"
+    "LC_MONETARY"
+    "LC_NAME"
+    "LC_NUMERIC"
+    "LC_PAPER"
+    "LC_TELEPHONE"
+    "LC_TIME"
+  ];
+in {
+  options.modules.system.locale = {
+    enable = lib.mkEnableOption "Locale and time zone settings";
+
+    timeZone = lib.mkOption {
+      type = lib.types.str;
+      default = "Europe/Rome";
+      description = "System time zone (see timedatectl list-timezones).";
+    };
+
+    language = lib.mkOption {
+      type = lib.types.str;
+      default = "en_US.UTF-8";
+      example = "it_IT.UTF-8";
+      description = "Default locale: UI language and messages (i18n.defaultLocale).";
+    };
+
+    formats = lib.mkOption {
+      type = lib.types.str;
+      default = "es_VE.UTF-8";
+      example = "it_IT.UTF-8";
+      description = "Locale used for the LC_* categories (dates, numbers, currency, paper, ...).";
+    };
+
+    formatOverrides = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = {LC_PAPER = "it_IT.UTF-8";};
+      description = "Per-category overrides applied on top of `formats`.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    time.timeZone = cfg.timeZone;
+
+    i18n.defaultLocale = cfg.language;
+
+    i18n.extraLocaleSettings =
+      lib.genAttrs lcCategories (_: cfg.formats)
+      // cfg.formatOverrides;
+  };
+}
+
+===== ./modules/system/networkManager.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.system.networkManager;
+in {
+  options.modules.system.networkManager = {
+    enable = lib.mkEnableOption "Enabling networkManager";
+
+    hostName = lib.mkOption {
+      type = lib.types.str;
+      default = "nixos";
+      description = "HostName, default nixos";
+    };
+
+    randomizeMac = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Randomize the Wi-Fi MAC address per connection (privacy on public networks)";
+    };
+
+    vpnPlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+      example = lib.literalExpression "[pkgs.networkmanager-openvpn]";
+      description = "NetworkManager VPN plugins (WireGuard is built in)";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    networking.hostName = cfg.hostName;
+
+    networking.networkmanager = {
+      enable = true;
+
+      wifi = {
+        backend = "wpa_supplicant";
+        macAddress = lib.mkIf cfg.randomizeMac "random";
+        scanRandMacAddress = true;
+      };
+
+      # Let systemd-resolved handle DNS (split DNS, VPNs, caching)
+      dns = "systemd-resolved";
+
+      plugins = cfg.vpnPlugins;
+
+      # Keep NM away from container interfaces (you use podman)
+      unmanaged = [
+        "interface-name:podman*"
+        "interface-name:veth*"
+      ];
+    };
+
+    # gives correct per-link DNS, helpw with some VPNs
+    services.resolved.enable = true;
+
+    # Needed for WireGuard/VPNs with strict reverse path filtering
+    networking.firewall.checkReversePath = "loose";
+
+    # Don't block boot waiting for the network on a laptop
+    systemd.services.NetworkManager-wait-online.enable = false;
+
+    environment.systemPackages = with pkgs; [
+      networkmanagerapplet
+    ];
+  };
+}
+
+===== ./modules/system/nix.nix =====
+{
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.modules.system.nix;
+in {
+  options.modules.system.nix.enable = lib.mkEnableOption "Nix flakes and gc settings";
+
+  config = lib.mkIf cfg.enable {
+    nix.settings = {
+      experimental-features = ["nix-command" "flakes"];
+      auto-optimise-store = true;
+    };
+
+    system.autoUpgrade.flake = {
+      enable = true;
+      dates = "weekly";
+    };
+
+    nix.gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 10d";
+    };
+
+    nixpkgs.config.allowUnfree = true;
+  };
+}
+
+===== ./modules/system/user.nix =====
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.modules.system.user;
+in {
+  options.modules.system.user = {
+    name = lib.mkOption {
+      type = lib.types.str;
+      description = "Primary user name for this host (must be set by every host)";
+    };
+
+    extraGroups = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = ["wheel" "networkmanager" "video"];
+      description = "Primary user extraGroups for this host";
+    };
+
+    shell = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.bash;
+      description = "Primary user default shell for this host";
+    };
+
+    initialPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "passpass";
+      description = "Primary user initial password for this host";
+    };
+  };
+
+  config.users.users.${cfg.name} = {
+    isNormalUser = true;
+    inherit (cfg) extraGroups shell initialPassword;
+  };
+}
+
+===== ./README.md =====
+# NixOS configuration
+
+```
+modules/    single-purpose, option-gated, off by default (auto-imported)
+hosts/      hardware, identity, host-specific, modules
+hosts/common/      Config always applied
+```
+
+Rebuild zbook:
+
+```bash
+sudo nixos-rebuild switch --flake .#zbook
+```
+
+New host: create `hosts/<name>/` (with its `hardware-configuration.nix`), set
+`myUser.name`, enable wanted modules, and add new `nixosConfiguration` entry in `flake.nix`.
+
+
+Format flake code running:
+
+```bash
+nix fmt .
+```
+
+Clean rollback generations:
+
+```bash
+#clean generations older than 7 days
+sudo nix-collect-garbage --delete-older-than 7d
+
+#or
+#clean all non-current generations
+sudo nix-collect-garbage -d
+
+```
+

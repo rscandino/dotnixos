@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.modules.cli;
+  cfg = config.modules.system.cli;
 in {
-  options.modules.cli.enable = lib.mkEnableOption "Everyday CLI and diagnostic tools";
+  options.modules.system.cli.enable = lib.mkEnableOption "Everyday CLI and diagnostic tools";
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
@@ -22,6 +22,8 @@ in {
       eza
       bat
       htop
+      unzip
+      zip
     ];
   };
 }

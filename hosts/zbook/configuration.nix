@@ -3,39 +3,62 @@
     ./hardware-configuration.nix
   ];
 
-  networking.hostName = "zbook";
-  networking.networkmanager.enable = true;
-
-  myUser.name = "riccardo";
-
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
   zramSwap.enable = true;
 
-  services.displayManager.ly.enable = true;
-
+  # ----- Modules -----
   modules = {
-    laptop.enable = true;
-    nvidiaPrime = {
-      enable = true;
-      intelBusId = "PCI:0@0:2:0";
-      nvidiaBusId = "PCI:1@0:0:0";
+
+    boot = {
+      systemd-boot.enable = true;
+      plymouth.enable = true;
     };
 
-    mango.enable = true;
-    audio.enable = true;
-    fonts.enable = true;
-    apps.enable = true;
-    gaming.enable = true;
-
-    cli.enable = true;
-    dev.enable = true;
-    clamshell.enable = true;
-    dotfiles = {
-      enable = true;
-      directory = "/home/${config.myUser.name}/Projects/dotfiles";
+    hardware = {
+      intel.enable = true;
+      nvidiaPrime = {
+        enable = true;
+        intelBusId = "PCI:0@0:2:0";
+        nvidiaBusId = "PCI:1@0:0:0";
+        igpuPciAddress = "0000:00:02.0";
+      };
+      powerManagement = {
+        enable = true;
+        backend = "tlp";
+        tlp.chargeThresholds = {
+          start = 75;
+          stop = 80;
+        };
+      };
+      touchpad.enable = true;
+      keyboard.enable = true;
     };
+
+    system = {
+      user.name = "riccardo";
+      nix.enable = true;
+      locale.enable = true;
+      networkManager = {
+        enable = true;
+        hostName = "zbook";
+      };
+      dev.enable = true;
+      dotfiles = {
+        enable = true;
+        directory = "/home/${config.modules.system.user.name}/Projects/dotfiles";
+      };
+      cli.enable = true;
+    };
+
+    desktop = {
+      audio.enable = true;
+      fonts.enable = true;
+      displayManager.enable = true;
+      apps.enable = true;
+      gaming.enable = true;
+      mango.enable = true;
+      clamshell.enable = true;
+    };
+
   };
 
   # Set to the NixOS release you first installed; do not bump it later.

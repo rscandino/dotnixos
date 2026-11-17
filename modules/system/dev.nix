@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: let
-  cfg = config.modules.dev;
+  cfg = config.modules.system.dev;
 in {
-  options.modules.dev.enable = lib.mkEnableOption "development tools";
+  options.modules.system.dev.enable = lib.mkEnableOption "Development tools";
 
   config = lib.mkIf cfg.enable {
     programs.neovim = {
@@ -35,6 +35,10 @@ in {
       distrobox
       git
       jujutsu
+      man
+      man-pages
+      man-pages-posix
+      linux-manual
       ripgrep
       fd
       jq
